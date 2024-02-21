@@ -1,0 +1,28 @@
+{
+  "name": "430-project-1",
+  "version": "1.0.0",
+  "description": "An online image color mask applier",
+  "main": "./src/server.js",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.29.1",
+    "nodemon": "^3.0.3"
+  },
+  "scripts": {
+    "test": "echo \"Tests complete\"",
+    "pretest":"eslint .src/ --fix",
+    "start":"node ./src/server.js",
+    "nodemon": "e- js,html,css --watch ./src --watch ./client ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RaineT07/430-project1.git"
+  },
+  "author": "Raine Taber",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RaineT07/430-project1/issues"
+  },
+  "homepage": "https://github.com/RaineT07/430-project1#readme"
+}
