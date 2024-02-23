@@ -1,6 +1,7 @@
 const http = require('http');
 const url = require('url');
 const query = require('querystring');
+const formidable = require('formidable');
 const htmlHandler = require('./htmlResponses.js');
 const jsonHandler = require('./jsonResponses.js');
 
@@ -19,6 +20,7 @@ const urlStruct = {
   },
   POST: {
     '/addUser': jsonHandler.addUser,
+    'addImage': jsonHandler.addImage,
     notFound: jsonHandler.notFound,
   },
   notFound: jsonHandler.notFoundMeta,

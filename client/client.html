@@ -67,6 +67,8 @@
       let nameAction = '';
       let nameField =  '';
       let ageField =   '';
+      let imageField = '';
+      let encType = '';
       let response = '';
 
       if(form == document.querySelector('#userForm')){
@@ -78,7 +80,7 @@
             'Accept': 'application/json'
           },
         });
-      }else{
+      }else if(form==document.querySelector('#nameForm')){
         nameAction = '/addUser';
         method = form.getAttribute('method');
         nameField = form.querySelector('#nameField');
@@ -95,6 +97,27 @@
           },
           body:formData,
         });
+      }else{
+        nameAction = '/addImage';
+        method = form.getAttribute('method');
+        nameField = form.querySelector('#imageNameField');
+        encType = form.getAttribute('enctype');
+        imageField = form.querySelector('#imgSelect').files[0];
+
+        imageField = {
+          'name': nameField.value,
+          'file':imageField
+        }
+
+        response = await fetch(nameAction,{
+          method: method,
+          headers:{
+            'Content-Type': encType,
+            'Accept':'application/json'
+          },
+          body:imageField
+        });
+
       }
       handleResponse(response, method);
 
@@ -103,6 +126,7 @@
     const init = () =>{
       const userForm = document.querySelector('#userForm');
       const nameForm = document.querySelector('#nameForm');
+      const imageForm = document.querySelector('#imageForm');
 
       const handleName = (e) =>{
         e.preventDefault();
@@ -116,8 +140,15 @@
         return false;
       }
 
+      const handleImage = (e) =>{
+        e.preventDefault();
+        userUpdate(imageForm);
+        return false;
+      }
+
       userForm.addEventListener('submit', handleUser);
       nameForm.addEventListener('submit', handleName);
+      imageForm.addEventListener('submit', handleImage);
     }
 
     window.onload = init;
@@ -143,6 +174,13 @@
         <option value="head">HEAD</option>
       </select>
       <input type="submit" value="Get User" />
+    </form>
+    <form id="imageForm" action="/uploadImage" method="post" enctype="multipart/form-data">
+      <label for="imageName">Image name: </label>
+      <input id="imageNameField" type="text" name="imageName" />
+      <label for="imageInput">Upload image here:</label>
+      <input id="imgSelect" type="file" name="imageInput" accept='image/png, image/jpeg' multiple="false" required>
+      <input id="imgSub" type="submit" value="Submit Image">
     </form>
   </section>
   <section id="content">
