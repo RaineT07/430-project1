@@ -20,14 +20,26 @@ const urlStruct = {
   },
   POST: {
     '/addUser': jsonHandler.addUser,
-    'addImage': jsonHandler.addImage,
+    '/addImage': jsonHandler.addImage,
     notFound: jsonHandler.notFound,
   },
   notFound: jsonHandler.notFoundMeta,
 };
 
-const parseBody = (request, response, handler) => {
+const parseBody = async (request, response, handler) => {
   const body = [];
+
+  let fields;
+  let files;
+
+  let form = formidable({});
+
+  try{
+    console.log('parsing body');
+    [fields, files] = await form.parse(request);
+  }catch (err){
+    console.log(err);
+  }
 
   request.on('error', (err) => {
     console.dir(err);
@@ -53,15 +65,27 @@ const onRequest = (request, response) => {
 
   // const acceptedTypes = request.headers.accept.split(',');
 
+  console.log('request heard');
+
   const method = urlStruct[request.method];
   const handler = method[parsedUrl.pathname];
 
   if (!urlStruct[request.method]) {
     return urlStruct.HEAD.notFound(request, response);
   }
-  //
+  console.log(urlStruct[request.method][parsedUrl.pathname]);
   if (urlStruct[request.method][parsedUrl.pathname]) {
-    if (request.method === 'POST') { parseBody(request, response, handler); } else if (request.method === 'GET' || request.method === 'HEAD') { urlStruct[request.method][parsedUrl.pathname](request, response); } else { urlStruct.HEAD.notFound(request, response, parsedUrl); }
+    //found urlStruct method
+    console.log(`found urlStruct method: ${urlStruct[request.method][parsedUrl.pathname]}`);
+    if (request.method === 'POST') { 
+      parseBody(request, response, handler); 
+    } 
+    else if (request.method === 'GET' || request.method === 'HEAD') { 
+      urlStruct[request.method][parsedUrl.pathname](request, response); 
+    } 
+    else { 
+      urlStruct.HEAD.notFound(request, response, parsedUrl); 
+    }
   }
   return null;
 };

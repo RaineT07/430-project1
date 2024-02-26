@@ -98,6 +98,7 @@
           body:formData,
         });
       }else{
+        console.log('got to updateUser with imageForm')
         nameAction = '/addImage';
         method = form.getAttribute('method');
         nameField = form.querySelector('#imageNameField');
@@ -175,10 +176,10 @@
       </select>
       <input type="submit" value="Get User" />
     </form>
-    <form id="imageForm" action="/uploadImage" method="post" enctype="multipart/form-data">
-      <label for="imageName">Image name: </label>
+    <form id="imageForm" action="/addImage" method="post" enctype="multipart/form-data">
+      <label for="imageNameField">Image name: </label>
       <input id="imageNameField" type="text" name="imageName" />
-      <label for="imageInput">Upload image here:</label>
+      <label for="imageSelect">Upload image here:</label>
       <input id="imgSelect" type="file" name="imageInput" accept='image/png, image/jpeg' multiple="false" required>
       <input id="imgSub" type="submit" value="Submit Image">
     </form>
