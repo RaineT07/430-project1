@@ -1,4 +1,5 @@
 const users = {};
+const images = {};
 
 const respondJSON = (request, response, status, object) => {
   response.writeHead(status, { 'Content-Type': 'application/json' });
@@ -58,10 +59,37 @@ const addUser = (request, response, body) => {
   return respondJSONMeta(request, response, responseCode);
 };
 
+const addImage = (request, response, body) =>{
+  const responseJSON = {
+    message:'Name and image file are both required',
+  };
+
+  if (!body.name || !body.file){
+    responseJSON.id='missingParams';
+    return respondJSON(request,response,300,responseJSON);
+  }
+  let responseCode = 204;
+  if(!images[body.name]){
+    responseCode=201;
+    images[body.name] = {};
+  }
+
+  users[body.name].name = body.name;
+  users[body.name].image = body.file;
+
+  if(responseCode ===201){
+    responseJSON.message = 'Created Successfully';
+    return respondJSON(request,response,responseCode,responseJSON);
+  }
+
+  return respondJSONMeta(request,response,responseCode);
+}
+
 module.exports = {
   getUsers,
   getUsersMeta,
   notFound,
   notFoundMeta,
   addUser,
+  addImage,
 };

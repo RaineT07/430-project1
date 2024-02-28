@@ -32,7 +32,7 @@ const parseBody = async (request, response, handler) => {
   let fields;
   let files;
 
-  let form = formidable({});
+  let form = formidable.formidable({});
 
   try{
     console.log('parsing body');
@@ -41,19 +41,18 @@ const parseBody = async (request, response, handler) => {
     console.log(err);
   }
 
-  request.on('error', (err) => {
+  form.on('error', (err) => {
     console.dir(err);
     response.statusCode = 400;
     response.end();
   });
 
-  request.on('data', (chunk) => {
-    body.push(chunk);
+  form.on('field', (fieldName,fieldValue) => {
+    fields.push({fieldName,fieldValue});
   });
 
-  request.on('end', () => {
-    const bodyString = Buffer.concat(body).toString();
-    const bodyParams = query.parse(bodyString);
+  form.on('end', () => {
+    console.log('post done from "end" event');
 
     handler(request, response, bodyParams);
     console.log(bodyParams);
@@ -63,9 +62,8 @@ const parseBody = async (request, response, handler) => {
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
-  // const acceptedTypes = request.headers.accept.split(',');
-
-  console.log('request heard');
+  const acceptedTypes = request.headers.accept.split(',');
+  console.log(request.headers);
 
   const method = urlStruct[request.method];
   const handler = method[parsedUrl.pathname];
@@ -73,10 +71,8 @@ const onRequest = (request, response) => {
   if (!urlStruct[request.method]) {
     return urlStruct.HEAD.notFound(request, response);
   }
-  console.log(urlStruct[request.method][parsedUrl.pathname]);
   if (urlStruct[request.method][parsedUrl.pathname]) {
     //found urlStruct method
-    console.log(`found urlStruct method: ${urlStruct[request.method][parsedUrl.pathname]}`);
     if (request.method === 'POST') { 
       parseBody(request, response, handler); 
     } 
