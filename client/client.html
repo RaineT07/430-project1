@@ -106,7 +106,7 @@
         console.log(`encType: ${encType}`);
         imageField = form.querySelector('#imgSelect').files[0];
 
-        const imageField = `name=${nameField.value}&imageInput=${imageField}`;
+        imageField = `name=${nameField.value}&imageInput=${imageField}`;
 
         response = await fetch(nameAction,{
           method: method,

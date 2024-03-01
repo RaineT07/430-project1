@@ -1,3 +1,5 @@
+const formidable = require("formidable");
+
 const users = {};
 const images = {};
 
@@ -59,7 +61,22 @@ const addUser = (request, response, body) => {
   return respondJSONMeta(request, response, responseCode);
 };
 
-const addImage = (request, response, body) =>{
+const addImage = async (request, response, body) =>{
+
+  const form = formidable.formidable({});
+  let fields;
+  let files;
+
+  let responseCode = 204;
+
+  try{
+    [fields,files] = await form.parse(request);
+  }catch (err){
+    console.log(err);
+    responseCode = 500;
+    return respondJSON(request,response,responseCode);
+  }
+
   const responseJSON = {
     message:'Name and image file are both required',
   };
@@ -68,7 +85,6 @@ const addImage = (request, response, body) =>{
     responseJSON.id='missingParams';
     return respondJSON(request,response,300,responseJSON);
   }
-  let responseCode = 204;
   if(!images[body.name]){
     responseCode=201;
     images[body.name] = {};

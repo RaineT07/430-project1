@@ -36,24 +36,25 @@ const parseBody = async (request, response, handler) => {
 
   try{
     console.log('parsing body');
-    [fields, files] = await form.parse(request);
+    // [fields, files] = await form.parse(request);
+    // console.log('parsing done');
   }catch (err){
     console.log(err);
   }
 
-  form.on('error', (err) => {
+  request.on('error', (err) => {
     console.dir(err);
     response.statusCode = 400;
     response.end();
   });
 
-  form.on('field', (fieldName,fieldValue) => {
-    fields.push({fieldName,fieldValue});
+  request.on('data', (chunk) =>{
+    body.push(chunk);
   });
 
-  form.on('end', () => {
-    console.log('post done from "end" event');
-
+  request.on('end', () => {
+    let bodyString = Buffer.concat(body).toString();
+    let bodyParams = query.parse(bodyString);
     handler(request, response, bodyParams);
     console.log(bodyParams);
   });
