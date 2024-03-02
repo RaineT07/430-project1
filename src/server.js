@@ -4,6 +4,7 @@ const query = require('querystring');
 const formidable = require('formidable');
 const htmlHandler = require('./htmlResponses.js');
 const jsonHandler = require('./jsonResponses.js');
+const { type } = require('os');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
@@ -55,8 +56,8 @@ const parseBody = async (request, response, handler) => {
   request.on('end', () => {
     let bodyString = Buffer.concat(body).toString();
     let bodyParams = query.parse(bodyString);
-    handler(request, response, bodyParams);
-    console.log(bodyParams);
+    console.log(typeof(bodyString));
+    handler(request, response, bodyString);
   });
 };
 
@@ -64,7 +65,7 @@ const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
   const acceptedTypes = request.headers.accept.split(',');
-  console.log(request.headers);
+  // console.log(request.headers);
 
   const method = urlStruct[request.method];
   const handler = method[parsedUrl.pathname];

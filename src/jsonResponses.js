@@ -42,6 +42,7 @@ const addUser = (request, response, body) => {
   };
 
   if (!body.name || !body.age) {
+    console.log('params missing')
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -63,16 +64,19 @@ const addUser = (request, response, body) => {
 
 const addImage = async (request, response, body) =>{
 
+  console.log('in addImage');
   const form = formidable.formidable({});
   let fields;
   let files;
 
-  let responseCode = 204;
-
+  console.log(body);
   try{
-    [fields,files] = await form.parse(request);
+    console.log('in try');
+    [fields,files] = await form.parse(body);
+    console.log(`fields: ${fields}, files:${files}`);
   }catch (err){
     console.log(err);
+    console.log('erroring out');
     responseCode = 500;
     return respondJSON(request,response,responseCode);
   }
@@ -81,7 +85,7 @@ const addImage = async (request, response, body) =>{
     message:'Name and image file are both required',
   };
 
-  if (!body.name || !body.file){
+  if (!body.name || !body.imageInput){
     responseJSON.id='missingParams';
     return respondJSON(request,response,300,responseJSON);
   }
@@ -91,7 +95,7 @@ const addImage = async (request, response, body) =>{
   }
 
   users[body.name].name = body.name;
-  users[body.name].image = body.file;
+  users[body.name].image = body.imageInput;
 
   if(responseCode ===201){
     responseJSON.message = 'Created Successfully';
