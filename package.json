@@ -1,7 +1,7 @@
 {
   "name": "430-project-1",
   "version": "1.0.0",
-  "description": "An online image color mask applier",
+  "description": "",
   "main": "./src/server.js",
   "devDependencies": {
     "eslint": "^8.56.0",
@@ -11,7 +11,7 @@
   },
   "scripts": {
     "test": "echo \"Tests complete\"",
-    "pretest": "eslint .src/ --fix",
+    "pretest": "eslint ./src --fix",
     "start": "node ./src/server.js",
     "nodemon": "nodemon -e js,html,css --watch ./src --watch ./client ./src/server.js"
   },

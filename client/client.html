@@ -14,6 +14,7 @@
 
       let successful = true;
 
+      //start by processing the status code from the response, and giving out the subtitle for each status code
       switch(response.status){
         case 200:
           content.innerHTML = `<b>Success</b>`;
@@ -31,6 +32,9 @@
           content.innerHTML = `<b>Not Found</b>`;
           successful = false;
           break;
+        case 500:
+          content.innerHTML = `<b>Internal Server Error</b>`;
+          break;
         default:  
           content.innerHTML = `<b>Error code not implemented by client.</b>`;
           break;
@@ -38,17 +42,49 @@
 
 
       if(method==='get'){
-
         let obj = await response.json();
-        let jsonString = JSON.stringify(obj);
-        let jsonObj = JSON.parse(jsonString);
-        let parsedObj = ''
-        if(successful){      
-          parsedObj = JSON.stringify(jsonObj.users);
+        console.log(obj);
+        if(obj.data){
+          console.log('data retrieved');
+          let jsonData = JSON.stringify(obj);
+          jsonData = JSON.parse(jsonData);
+          const imageBase64 = jsonData.data;
+          const imageElement = document.createElement('img');
+          imageElement.src = `data:image/png;base64,${imageBase64}`;
+          imageElement.id = 'image';
+          if(document.querySelector('#image')){
+            document.querySelector('#image').outerHTML = imageElement.outerHTML;
+          }else{
+            content.innerHTML += imageElement.outerHTML;
+          }
+        }else if(obj.dataSet){
+          console.log('data set retrieved');
+          let jsonData = JSON.stringify(obj);
+          jsonData = JSON.parse(jsonData);
+          let parsedElements = [];
+          jsonData.dataSet.forEach(element => {
+            let parsedImage = element
+            let newElement = document.createElement('img');
+            newElement.src = `data:image/png;base64,${parsedImage}`;
+            parsedElements.push(newElement.outerHTML);
+          });
+          let imageDiv = document.createElement('div');
+          imageDiv.id = 'imageDiv';
+          imageDiv.innerHTML = parsedElements.join('');
+          content.innerHTML = imageDiv.outerHTML;
         }else{
-          parsedObj = JSON.stringify(jsonObj.message);
+          let jsonString = JSON.stringify(obj);
+          let jsonObj = JSON.parse(jsonString);
+          let parsedObj = ''
+          if(successful){      
+            parsedObj = JSON.stringify(jsonObj.users);
+          }else{
+            parsedObj = JSON.stringify(jsonObj.message);
+          }
+          content.innerHTML += `<p>${parsedObj}</p>`;
         }
-        content.innerHTML += `<p>${parsedObj}</p>`;
+      }else if(method=='head'){
+        content.innerHTML += `<p>Head request recieved</p>`;
       }else{
         let obj = await response.json();
         console.log(obj);
@@ -60,8 +96,8 @@
     };
 
     const userUpdate = async (form) =>{
-      //grab just, ALL the info
 
+      //initialize variables
       let url='';
       let method = '';
       let nameAction = '';
@@ -71,7 +107,11 @@
       let encType = '';
       let response = '';
 
+
+      //determine which form is being used
+      //for get/head requests
       if(form == document.querySelector('#userForm')){
+        //make the call from the url in the form, and the method selected
         url =     form.querySelector('#urlField').value;
         method =  form.querySelector('#methodSelect').value;
         response = await fetch(url,{
@@ -80,15 +120,17 @@
             'Accept': 'application/json'
           },
         });
+
+      // for name post requests
       }else if(form==document.querySelector('#nameForm')){
+        //this code is left from the the http api assignment
         nameAction = '/addUser';
         method = form.getAttribute('method');
         nameField = form.querySelector('#nameField');
         ageField = form.querySelector('#ageField');
 
+        //basic form data with body params
         const formData = `name=${nameField.value}&age=${ageField.value}`;
-        // console.log(formData);
-
         response = await fetch(nameAction, {
           method:method,
           headers:{
@@ -97,15 +139,19 @@
           },
           body:formData,
         });
+
+      //for image post requests
       }else{
-        console.log('got to updateUser with imageForm')
+
         nameAction = '/addImage';
         method = form.getAttribute('method');
         nameField = form.querySelector('#imageNameField');
         encType = form.getAttribute('enctype');
         console.log(`encType: ${encType}`);
+        //grab the file from the form
         imageField = form.querySelector('#imgSelect').files[0];
 
+        //similar to the name post, format the file.
         imageField = `name=${nameField.value}&imageInput=${imageField}`;
 
         response = await fetch(nameAction,{
@@ -116,17 +162,21 @@
           },
           body:imageField
         });
-
       }
+
+      //once the form is processed and the server code is run, handle the response
       handleResponse(response, method);
 
     };
 
     const init = () =>{
+      //grab the three form
       const userForm = document.querySelector('#userForm');
       const nameForm = document.querySelector('#nameForm');
       const imageForm = document.querySelector('#imageForm');
 
+
+      //these three listeners allow for the same user update function to be used for all three forms
       const handleName = (e) =>{
         e.preventDefault();
         userUpdate(nameForm);
@@ -145,6 +195,7 @@
         return false;
       }
 
+      //actually hooks up the event listeners
       userForm.addEventListener('submit', handleUser);
       nameForm.addEventListener('submit', handleName);
       imageForm.addEventListener('submit', handleImage);
@@ -166,6 +217,8 @@
     <form id="userForm" action="/getUsers" method="get">
       <select id='urlField'>
         <option value='/getUsers'>/getUsers</option>
+        <option value='/getRandomImage'>/getRandomImage</option>
+        <option value='/getAllImages'>/getAllImages</option>
         <option value='/notReal'>/notReal</option>
       </select>
       <select id="methodSelect">
